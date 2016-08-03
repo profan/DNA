@@ -59,14 +59,25 @@ struct Window {
 
 	} // ~this
 
-	static load() {
+	/**
+	 * Loads necessary libraries for this module.
+	 * TODO: error codes for when things go wrong.
+	*/
+	static void load() {
+
+		shared static bool is_initialized = false;
+		if (is_initialized) return;
 
 		DerelictSDL2.load();
 		SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
+		is_initialized = true;
 
 	} // load
 
 	static Error create(ref Window window, uint width, uint height) {
+
+		// initialize
+		Window.load();
 
 		uint flags = 0;
 		flags |= SDL_WINDOW_OPENGL;

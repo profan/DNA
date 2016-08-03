@@ -28,6 +28,8 @@ struct Engine {
 
 		// modules go here
 		Window window_;
+
+		// default graphics data
 		FontAtlas text_atlas_;
 
 		// how fast are we going?
@@ -50,8 +52,16 @@ struct Engine {
 
 	@property {
 
-		int update_rate() { return update_rate_; }
+		int update_rate () { return update_rate_; }
+		int update_rate (int new_rate) {
+			if (new_rate > 0) { update_rate_ = new_rate; }
+			return update_rate_;
+		}
 		int draw_rate() { return draw_rate_; }
+		int draw_rate(int new_rate) {
+			if (new_rate > 0) { draw_rate_ = new_rate; }
+			return draw_rate_;
+		}
 
 	}
 
@@ -77,15 +87,6 @@ struct Engine {
 	} // ~this
 
 	/**
-	 * Load and initialize dynamic libraries required for the engine.
-	*/
-	static load() {
-
-		Window.load();
-
-	} // load
-
-	/**
 	 * Convenience overload that allows passing two free functions and automatically converts them to
 	 *  delegates internally.
 	*/
@@ -97,12 +98,12 @@ struct Engine {
 
 	} // create
 
+	/**
+	 * Initializes the engine and its modules, returning an error code if something goes wrong.
+	*/
 	static Error create(ref Engine engine, UpdateFunc update_fn, DrawFunc draw_fn) {
 
 		import std.stdio : writefln;
-
-		// init modules
-		Input.initialize();
 
 		auto result = Window.create(engine.window_, 640, 480);
 		final switch (result) with (Window.Error) {
@@ -116,8 +117,8 @@ struct Engine {
 				break;
 		}
 
-		// loade
-		FontAtlas.load();
+		// init input modules (depends on previous currently)
+		Input.initialize();
 
 		auto atlas_result = FontAtlas.create(engine.text_atlas_, "fonts/OpenSans-Regular.ttf", 12);
 		final switch (atlas_result) with (FontAtlas.Error) {

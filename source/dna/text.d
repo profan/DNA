@@ -2,8 +2,8 @@ module dna.text;
 
 import core.stdc.stdio : printf;
 
-import std.typecons : tuple;
 import std.algorithm.mutation : move;
+import std.typecons : tuple;
 import std.algorithm : max;
 
 import derelict.freetype.ft;
@@ -14,7 +14,7 @@ import gland.gl;
 
 private {
 
-	immutable char* vs_shader = "
+	immutable char* vs_shader = q{
 		#version 330 core
 
 		uniform mat4 projection;
@@ -27,9 +27,9 @@ private {
 			gl_Position = projection * vec4(coord.xy, 0.0, 1.0);
 			tex_coord = coord.zw;
 		}
-	";
+	};
 
-	immutable char* fs_shader = "
+	immutable char* fs_shader = q{
 		#version 330 core
 
 		in vec2 tex_coord;
@@ -40,7 +40,7 @@ private {
 		void main() {
 			gl_FragColor = vec4(colour.rgb, texture2D(tex, tex_coord).r);
 		}
-	";
+	};
 
 	alias Mat4f = float[4][4];
 	alias Vec4f = float[4];
@@ -117,7 +117,10 @@ struct FontAtlas {
 	}
 
 	static void load() {
-	
+
+		shared static bool is_initialized = false;
+		if (is_initialized) return;
+
 		import derelict.util.exception;
 		
 		ShouldThrow ignoreMissing(string symbolName) {
@@ -149,6 +152,8 @@ struct FontAtlas {
 			return; // exit now
 		}
 
+		is_initialized = true;
+
 	} // load
 	
 	static unload() {
@@ -158,6 +163,9 @@ struct FontAtlas {
 	} // unload
 
 	static Error create(ref FontAtlas atlas, in char* font_name, int font_size) {
+
+		// loadan libs
+		FontAtlas.load();
 
 		// freetype shit
 		FT_Face face;

@@ -4,9 +4,6 @@ import dna;
 
 void main() {
 
-	// init
-	Game.load();
-
 	Game game;
 	auto result = Game.create(game);
 	final switch (result) with (Engine.Error) {
@@ -27,13 +24,6 @@ struct Game {
 		Engine engine;
 	}
 
-	static void load() {
-
-		// load libs
-		Engine.load();
-
-	} // load
-
 	static auto create(ref Game game) {
 
 		return Engine.create(game.engine, &game.update, &game.draw);
@@ -52,7 +42,8 @@ struct Game {
 
 	void draw(double dt) {
 
-		engine.renderFmtString!("Update Rate: %d, Draw Rate: %d")(640/2, 480/2, engine.update_rate, engine.draw_rate);
+		auto mouse_pos = Input.mousePos();
+		engine.renderFmtString!("X: %d, Y: %d")(mouse_pos.x, mouse_pos.y, mouse_pos.x, mouse_pos.y);
 
 	} // draw
 

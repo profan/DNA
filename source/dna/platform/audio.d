@@ -64,6 +64,17 @@ struct SoundSystem {
 		this.sources_ = typeof(sources_)(allocator, num_sources);
 	} // this
 
+	static void load() {
+
+		shared static bool is_initialized = false;
+		if (is_initialized) return;
+
+		DerelictAL.load();
+		DerelictALURE.load();
+		is_initialized = true;
+
+	} // load
+
 	static Error create(ref SoundSystem system, IAllocator allocator, size_t num_sources) {
 
 		import std.algorithm.mutation : move;
