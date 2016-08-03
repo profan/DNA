@@ -125,8 +125,27 @@ struct SoundSystem {
 
 	} // expandSources
 
+
+	/**
+	 * Create a new OpenAL buffer from a passed $(D ubyte[]) slice, returning the ID assigned.
+	*/
+	auto loadSoundFromMemory(ubyte[] buffer) {
+
+		import std.string : format, fromStringz;
+
+		auto created_buffer = alureCreateBufferFromMemory(buffer.ptr, cast(int)buffer.length);
+		assert(created_buffer != AL_NONE,
+				format("[SoundSystem] failed creating buffer: %s", fromStringz(alureGetErrorString())));
+
+		buffers_[current_sound_id_] = created_buffer;
+
+		return current_sound_id_++;
+
+	} // loadSoundFromMemory
+
 	/**
 	 * Reads a file from disk given a path, adding it to the list of sound buffers, returning the ID assigned.
+	 * File path string passed _must_ be null terminated.
 	*/
 	auto loadSoundFile(char* path) {
 		
