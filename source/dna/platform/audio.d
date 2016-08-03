@@ -6,7 +6,7 @@ import std.experimental.allocator : IAllocator;
 import derelict.openal.al;
 import derelict.alure.alure;
 
-import dna.std.collections : Array, ArraySOA, HashMap;
+import dna.std.collections : ArraySOA, HashMap;
 
 alias SoundID = int;
 alias SoundVolume = float;
