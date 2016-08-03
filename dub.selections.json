@@ -1,0 +1,9 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"derelict-sdl2": "2.0.0",
+		"derelict-util": "2.0.6",
+		"gfm": "6.1.1",
+		"gland": "~feature/compute"
+	}
+}

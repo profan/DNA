@@ -1,0 +1,13 @@
+{
+	"name": "dna",
+	"description": "A minimal D application.",
+	"copyright": "Copyright © 2016, profan",
+	"authors": ["profan"],
+	"dependencies": {
+		"derelict-al": "~master",
+		"derelict-alure": "~>1.0.0",
+		"derelict-ft": "~>1.0.2",
+		"gland": "~feature/compute",
+		"tested": "~>0.9.4"
+	}
+}
