@@ -7,7 +7,7 @@ void main() {
 	Game game;
 	auto result = Game.create(game);
 	final switch (result) with (Engine.Error) {
-		case WindowInitFailed, FontInitFailed:
+		case WindowInitFailed, FontInitFailed, SoundInitFailed:
 			writefln("[WINDOW] Error: %s", cast(string)result);
 			break;
 		case Success: break;

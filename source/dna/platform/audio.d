@@ -20,10 +20,10 @@ auto to(T:ALboolean)(bool b) {
 struct SoundSystem {
 
 	enum Error {
-		FailedOpeningDevice,
-		FailedCreatingContext,
-		FailedMakingContextCurrent,
-		Success
+		FailedOpeningDevice = "Failed opening the sound device!",
+		FailedCreatingContext = "Failed creating the OpenAL context!",
+		FailedMakingContextCurrent = "Failed making the created context current!",
+		Success = "Successfully created the SoundSystem!"
 	} // Error
 
 	//TODO: take a look at this later, should it be a constant?
@@ -71,6 +71,7 @@ struct SoundSystem {
 
 		DerelictAL.load();
 		DerelictALURE.load();
+
 		is_initialized = true;
 
 	} // load
@@ -79,6 +80,8 @@ struct SoundSystem {
 
 		import std.algorithm.mutation : move;
 
+		// LOADETH ZE LIBS
+		SoundSystem.load();
 		assert(allocator);
 	
 		auto new_system = SoundSystem(allocator, num_sources);

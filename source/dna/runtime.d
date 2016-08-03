@@ -1,6 +1,9 @@
 module dna.runtime;
 
+import std.experimental.allocator : theAllocator, IAllocator;
+
 import dna.platform.window;
+import dna.platform.audio;
 import dna.platform.input;
 import dna.text;
 
@@ -19,6 +22,7 @@ struct Engine {
 	enum Error {
 
 		WindowInitFailed = "Window failed to initialize!",
+		SoundInitFailed = "Sound failed to initialize!",
 		FontInitFailed = "FontAtlas failed to initialize!",
 		Success = "Successfully initialized engine!"
 
@@ -27,6 +31,7 @@ struct Engine {
 	private {
 
 		// modules go here
+		SoundSystem sound_;
 		Window window_;
 
 		// default graphics data
@@ -114,6 +119,16 @@ struct Engine {
 			/* we succeeded, just continue. */
 			case Success:
 				writefln("[DNA] %s", cast(string)result);
+				break;
+		}
+
+		auto sound_result = SoundSystem.create(engine.sound_, theAllocator, 32);
+		final switch (sound_result) with (SoundSystem.Error) {
+			case FailedOpeningDevice, FailedCreatingContext, FailedMakingContextCurrent:
+			   writefln("[DNA] Failed initializing the sound subsystem: %s", cast(string)sound_result);
+			   return Error.SoundInitFailed; // ERRAR
+			case Success:
+				writefln("[DNA] %s", cast(string)sound_result);
 				break;
 		}
 
