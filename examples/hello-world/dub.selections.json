@@ -1,6 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"collections": "~master",
 		"derelict-al": "~master",
 		"derelict-alure": "1.0.0",
 		"derelict-ft": "1.0.2",

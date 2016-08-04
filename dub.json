@@ -8,6 +8,7 @@
 		"derelict-alure": "~>1.0.0",
 		"derelict-ft": "~>1.0.2",
 		"gland": "~feature/compute",
+		"collections": "~master",
 		"tested": "~>0.9.4"
 	}
 }
