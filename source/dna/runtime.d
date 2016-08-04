@@ -152,6 +152,9 @@ struct Engine {
 
 	} // create
 
+	/**
+	 * Clears the screen and calls the user-supplied draw function, presenting the rendered data after.
+	*/
 	void draw() {
 
 		Renderer.clearColour(0x428bca);
@@ -163,6 +166,11 @@ struct Engine {
 
 	} // draw
 
+	/**
+	 * Renders a string on screen at the given offset, operates like printf except
+	 *  the format string is a compile-time format string.
+	 * Uses the engine's built in $(D FontAtlas) member.
+	*/
 	void renderFmtString(string fmt, Args...)(float x, float y, Args args) {
 
 		import gland.util : orthographic, transpose;
@@ -172,6 +180,10 @@ struct Engine {
 
 	} // renderString
 
+	/**
+	 * Renders a string on screen starting at the given offset, using the engine's
+	 *  pre-existing $(D FontAtlas).
+	*/
 	void renderString(in char[] str, float offset_x = 0, float offset_y = 0) {
 
 		import gland.util : orthographic, transpose;
@@ -180,6 +192,11 @@ struct Engine {
 
 	} // renderString
 
+	/**
+	 * Starts the engine's fixed upate run loop, which attempts to run both update and draw at fixed intervals.
+	 * Currently does not do any pacing/dropping frames in order to retain the update speed if things start running slow,
+	 *  can be switched out by the user if they desire entirely custom functionality in terms of the run loop.
+	*/
 	void run() {
 
 		import dna.platform.timer : StopWatch;

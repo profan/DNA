@@ -2,6 +2,10 @@ module dna.platform.timer;
 
 import derelict.sdl2.sdl;
 
+/**
+ * Structure meant to represent a timespan in native clock ticks, can be used to represent time in seconds by
+ *  using the ticksPerSecond method.
+*/
 struct StopWatch {
 
 	import core.time : MonoTimeImpl, ClockType;
@@ -16,12 +20,18 @@ struct StopWatch {
 
 	}
 
+	/**
+	 * Returns the current tick value of the system clock, usually time passed since startup.
+	*/
 	static @property auto currTicks() {
 
 		return Clock.currTime.ticks;
 
 	} // currTicks
 
+	/**
+	 * Starts the StopWatch, setting the initial tick to the current tick the system clock is at.
+	*/
 	void start() {
 
 		initial_ticks_ = currTicks;
@@ -29,6 +39,10 @@ struct StopWatch {
 
 	} // start
 
+	/**
+	 * Stops the StopWatch, setting the passed ticks to time between the initial tick and
+	 *  the current point in time.
+	*/
 	void stop() {
 
 		passed_ticks_ += currTicks - initial_ticks_;
@@ -36,6 +50,10 @@ struct StopWatch {
 
 	} // stop
 
+	/**
+	 * Resets the StopWatch, setting the initial tick (starting point) to current time passed by the system clock
+	 *  if already started, otherwise to zero. TODO: WHY?
+	*/
 	void reset() {
 
 		if (started_) {
@@ -46,12 +64,19 @@ struct StopWatch {
 
 	} // reset
 
+	/**
+	 * Returns the amount of clock ticks per second for this StopWatch type.
+	*/
 	static long ticksPerSecond() {
 
 		return TicksPerSecond;
 
 	} // ticksPerSecond
 
+	/**
+	 * Returns the amount of time passed since starting the StopWatch, or the time between start and stop
+	 *  if it is currently paused.
+	*/
 	long peek() {
 
 		if (started_) {
@@ -93,12 +118,22 @@ void waitUntilTick(ref StopWatch sw, ulong ticks_per_frame) {
 
 } // waitUntil
 
+/**
+ * Uses SDL2's sleep function to wait a certain amount of milliseconds
+ *  granularity is rarely better than a few milliseconds (1-2 at best),
+ *  use when this is acceptable.
+*/
 void delayMs(uint ms) {
 
 	SDL_Delay(ms);
 
 } // delayMs
 
+/**
+ * Uses a loop to wait until a certain tick value is reached, used when
+ *  the system sleep function's granularity is not high enough, or when one might
+ *  otherwise not want to invoke it.
+*/
 void busyWaitTicks(ref StopWatch sw, ulong total_ticks) {
 
 	long ticks_left = total_ticks - sw.peek();
