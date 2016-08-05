@@ -252,7 +252,8 @@ struct FontAtlas {
 
 	} // create
 
-	void renderText(ref Device device, Mat4f[] projection_data, in char[] text, float x, float y, float sx, float sy, int colour) {
+	void renderText(DeviceType)(ref DeviceType device, Mat4f[] projection_data, in char[] text, float x, float y, float sx, float sy, int colour) 
+		if (isDevice!DeviceType) {
 
 		import core.stdc.stdlib : malloc, free;
 		Vertex4f[] coords = (cast(Vertex4f*)malloc(Vertex4f.sizeof * (text.length * 6)))[0..text.length*6];

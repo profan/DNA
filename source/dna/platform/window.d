@@ -110,7 +110,7 @@ struct Window {
 		window.adjustProjection();
 
 		// display modes
-		window.printDisplayModes();
+		// window.printDisplayModes();
 
 		return Error.Success;
 

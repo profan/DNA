@@ -1,9 +1,10 @@
 module dna.util;
 
 import dna.text : FontAtlas;
-import gland.gl : Device;
+import gland.gl : Device, isDevice;
 
-ref FontAtlas renderFmtString(string format, Args...)(ref FontAtlas atlas, ref Device device, float[4][4][1] projection, float offset_x, float offset_y, Args args) {
+ref FontAtlas renderFmtString(string format, DeviceType, Args...)(ref FontAtlas atlas, ref DeviceType device, float[4][4][1] projection, float offset_x, float offset_y, Args args)
+	if (isDevice!DeviceType) {
 
 	char[format.length*2] buf;
 	const char[] str = cformat(buf[], format, args);
