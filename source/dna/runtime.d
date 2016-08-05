@@ -30,6 +30,9 @@ struct Engine {
 
 	private {
 
+		// opengl rendering context
+		Device device_;
+
 		// modules go here
 		SoundSystem sound_;
 		Window window_;
@@ -110,7 +113,10 @@ struct Engine {
 
 		import std.stdio : writefln;
 
-		auto result = Window.create(engine.window_, 640, 480);
+		int screen_w = 640;
+		int screen_h = 480;
+
+		auto result = Window.create(engine.window_, screen_w, screen_h);
 		final switch (result) with (Window.Error) {
 			/* return from main if we failed, print stuff. */
 			case WindowCreationFailed, ContextCreationFailed:
@@ -121,6 +127,8 @@ struct Engine {
 				writefln("[DNA] %s", cast(string)result);
 				break;
 		}
+
+		engine.device_ = Renderer.createDevice(&engine.window_.width, &engine.window_.height);
 
 		auto sound_result = SoundSystem.create(engine.sound_, theAllocator, 32);
 		final switch (sound_result) with (SoundSystem.Error) {
@@ -157,7 +165,7 @@ struct Engine {
 	*/
 	void draw() {
 
-		Renderer.clearColour(0x428bca);
+		device_.clearColour(0x428bca);
 
 		// user draw
 		draw_fn_(1.0);
@@ -176,7 +184,7 @@ struct Engine {
 		import gland.util : orthographic, transpose;
 		import dna.util : renderFmtString;
 
-		text_atlas_.renderFmtString!fmt([window_.projection], x, y, args);
+		text_atlas_.renderFmtString!fmt(device_, [window_.projection], x, y, args);
 
 	} // renderString
 
@@ -188,7 +196,7 @@ struct Engine {
 
 		import gland.util : orthographic, transpose;
 
-		text_atlas_.renderText([window_.projection], str, offset_x, offset_y, 1, 1, 0xffffff);
+		text_atlas_.renderText(device_, [window_.projection], str, offset_x, offset_y, 1, 1, 0xffffff);
 
 	} // renderString
 

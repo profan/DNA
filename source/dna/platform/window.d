@@ -109,9 +109,39 @@ struct Window {
 		// set up screen space projection matrix
 		window.adjustProjection();
 
+		// display modes
+		window.printDisplayModes();
+
 		return Error.Success;
 
 	} // create
+
+	void printDisplayModes() {
+
+		auto result = SDL_GetNumVideoDisplays();
+		assert(result > 1);
+
+		foreach(d_i; 0 .. result) {
+
+			printf("[DNA] Display: %s \n", SDL_GetDisplayName(d_i));
+
+			float ddpi, hdpi, vdpi;
+			SDL_GetDisplayDPI(d_i, &ddpi, &hdpi, &vdpi);
+			printf("	- DPI: ddpi: %f, hdpi: %f, vdpi: %f \n", ddpi, hdpi, vdpi);
+
+			auto modes_result = SDL_GetNumDisplayModes(d_i);
+			assert(modes_result > 1);
+
+			printf("	- modes: ");
+			foreach (m_i; 0 .. modes_result) {
+				SDL_DisplayMode mode;
+				SDL_GetDisplayMode(d_i, m_i, &mode);
+				printf("		- w: %d, h: %d, refresh rate: %d \n", mode.w, mode.h, mode.refresh_rate);
+			}
+
+		}
+
+	} // printDisplayModes
 
 	private int createGLContext(int gl_major, int gl_minor) {
 

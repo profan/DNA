@@ -1,13 +1,14 @@
 module dna.util;
 
 import dna.text : FontAtlas;
+import gland.gl : Device;
 
-ref FontAtlas renderFmtString(string format, Args...)(ref FontAtlas atlas, float[4][4][1] projection, float offset_x, float offset_y, Args args) {
+ref FontAtlas renderFmtString(string format, Args...)(ref FontAtlas atlas, ref Device device, float[4][4][1] projection, float offset_x, float offset_y, Args args) {
 
 	char[format.length*2] buf;
 	const char[] str = cformat(buf[], format, args);
 
-	atlas.renderText(projection, str, offset_x, offset_y, 1, 1, 0xffffff);
+	atlas.renderText(device, projection, str, offset_x, offset_y, 1, 1, 0xffffff);
 
 	return atlas;
 
