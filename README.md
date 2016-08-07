@@ -6,6 +6,10 @@ A comparison to XNA might be apt as it intends to give you what is necessary to 
 
 However, unlike XNA it aims to be a bit more pure, and tries to avoid global and static state when possible.
 
+Basic Idea
+-----------
+Give the user a basic game loop, the possibility to easily play sound, (somewhat) easily draw on the screen, take input and get something up and running with as little ceremony as possible.
+
 What it provides
 -----------------
  * Audio Subsystem (Based on OpenAL)
