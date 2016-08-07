@@ -10,6 +10,8 @@ Basic Idea
 -----------
 Give the user a basic game loop, the possibility to easily play sound, (somewhat) easily draw on the screen, take input and get something up and running with as little ceremony as possible.
 
+All the while, all(optimistically) features should be both well documented API-wise and have examples covering their usage, hence when developing this, examples will be made for each new feature that makes it's way in.
+
 What it provides
 -----------------
  * Audio Subsystem (Based on OpenAL)
