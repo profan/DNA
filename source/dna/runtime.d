@@ -30,6 +30,9 @@ struct Engine {
 
 	private {
 
+		// main allocator
+		IAllocator allocator_;
+
 		// opengl rendering context
 		Device device_;
 
@@ -116,6 +119,9 @@ struct Engine {
 		int screen_w = 640;
 		int screen_h = 480;
 
+		// set up engine allocator
+		engine.allocator_ = theAllocator;
+
 		auto result = Window.create(engine.window_, screen_w, screen_h);
 		final switch (result) with (Window.Error) {
 			/* return from main if we failed, print stuff. */
@@ -130,7 +136,7 @@ struct Engine {
 
 		engine.device_ = Renderer.createDevice(&engine.window_.width, &engine.window_.height);
 
-		auto sound_result = SoundSystem.create(engine.sound_, theAllocator, 32);
+		auto sound_result = SoundSystem.create(engine.sound_, engine.allocator_, 32);
 		final switch (sound_result) with (SoundSystem.Error) {
 			case FailedOpeningDevice, FailedCreatingContext, FailedMakingContextCurrent:
 			   writefln("[DNA] Failed initializing the sound subsystem: %s", cast(string)sound_result);
