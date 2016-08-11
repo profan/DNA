@@ -134,7 +134,7 @@ struct Engine {
 				break;
 		}
 
-		engine.device_ = Renderer.createDevice(&engine.window_.width, &engine.window_.height);
+		engine.device_ = Renderer.createDevice(&engine.window_.width, &engine.window_.height, &engine.window_.present);
 
 		auto sound_result = SoundSystem.create(engine.sound_, engine.allocator_, 32);
 		final switch (sound_result) with (SoundSystem.Error) {
@@ -176,7 +176,7 @@ struct Engine {
 		// user draw
 		draw_fn_(1.0);
 
-		window_.present();
+		device_.present();
 
 	} // draw
 

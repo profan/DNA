@@ -56,7 +56,7 @@ private {
 		float[4] colour;
 
 		@TextureUnit(0)
-		Texture* tex;
+		Texture2D* tex;
 
 	} // TextUniform
 
@@ -114,7 +114,7 @@ struct FontAtlas {
 
 		TextVao vertices_;
 		TextShader shader_;
-		Texture texture_;
+		Texture2D texture_;
 
 		CharacterInfo[96] chars_;
 
@@ -216,7 +216,7 @@ struct FontAtlas {
 			wrapping : TextureWrapping.ClampToEdge
 		};
 
-		auto texture_result = Texture.create(atlas.texture_, null, w, h, params);
+		auto texture_result = Texture2D.create(atlas.texture_, cast(ubyte*)null, w, h, params);
 
 		int x = 0; // current x position in the resulting texture to write to
 		for (uint i = 32; i < 128; ++i) {

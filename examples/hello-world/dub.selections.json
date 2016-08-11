@@ -1,15 +1,17 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"collections": "~master",
+		"tested": "0.9.4",
 		"derelict-al": "~master",
-		"derelict-alure": "1.0.0",
 		"derelict-ft": "1.0.2",
 		"derelict-sdl2": "2.0.0",
+		"dna": {
+			"path": "../../"
+		},
 		"derelict-util": "2.0.6",
-		"dna": {"path":"../../"},
+		"derelict-alure": "1.0.0",
 		"gfm": "6.1.1",
-		"gland": "~feature/compute",
-		"tested": "0.9.4"
+		"gland": "~feature/textures",
+		"collections": "~master"
 	}
 }
