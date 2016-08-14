@@ -117,7 +117,6 @@ struct Window {
 	} // create
 
 	auto displays() {
-		
 
 		static struct ModeRange {
 		nothrow:
@@ -222,16 +221,16 @@ struct Window {
 	@nogc
 	void printDisplayModes() {
 
-		auto available_displays = displays();
+		auto displays = displays();
 		printf("[DNA] Listing displays and their modes. \n");
 
-		for (auto display = available_displays.front; !available_displays.empty; available_displays.popFront()) {
+		foreach (display; displays) {
 
 			printf("Display: %s \n", display.name);
 			printf(" DPI: ddpi: %f, hdpi: %f, vdpi: %f \n", display.ddpi, display.hdpi, display.vdpi);
 
 			auto modes = display.modes();
-			for (auto mode = modes.front; !modes.empty; modes.popFront()) {
+			foreach (mode; modes) {
 				printf("  - w: %d, h: %d, refresh rate: %d \n", mode.w, mode.h, mode.refresh_rate);
 			}
 
