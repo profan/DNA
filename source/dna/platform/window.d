@@ -218,20 +218,24 @@ struct Window {
 
 	} // displays
 
-	@nogc
+	@nogc nothrow
 	void printDisplayModes() {
 
-		auto displays = displays();
+		import std.range : enumerate;
+
+		auto all_displays = displays();
 		printf("[DNA] Listing displays and their modes. \n");
 
-		foreach (display; displays) {
+		foreach (d_i, ref display; all_displays.enumerate(1)) {
 
-			printf("Display: %s \n", display.name);
-			printf(" DPI: ddpi: %f, hdpi: %f, vdpi: %f \n", display.ddpi, display.hdpi, display.vdpi);
+			printf("%d. %s \n", d_i, display.name);
+			printf("   DPI: ddpi: %f, hdpi: %f, vdpi: %f \n", display.ddpi, display.hdpi, display.vdpi);
 
 			auto modes = display.modes();
-			foreach (mode; modes) {
-				printf("  - w: %d, h: %d, refresh rate: %d \n", mode.w, mode.h, mode.refresh_rate);
+
+			printf("   Display Modes: \n");
+			foreach (m_i, ref mode; modes.enumerate(1)) {
+				printf("    %d. w: %d, h: %d, refresh rate: %d \n", m_i, mode.w, mode.h, mode.refresh_rate);
 			}
 
 		}
