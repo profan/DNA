@@ -8,6 +8,66 @@ import derelict.sdl2.sdl;
 import glad.gl.loader;
 import glad.gl.gl;
 
+static struct Display {
+
+	static struct Mode {
+
+	} // Mode
+
+	static struct ModeRange {
+
+		@nogc:
+		nothrow:
+
+		// SDL2 display index
+		int display_;
+
+		int current_mode_;
+		int num_modes_;
+
+		this(int display_index, int modes) {
+			this.display_ = display_index;
+			this.num_modes_ = modes;
+			this.current_mode_ = 0;
+		} // this
+
+		@property bool empty() const {
+			return current_mode_ == num_modes_;
+		} // empty
+
+		@property SDL_DisplayMode front() {
+
+			SDL_DisplayMode mode;
+			SDL_GetDisplayMode(display_, current_mode_, &mode);
+
+			return mode;
+
+		} // front
+
+		void popFront() {
+
+			if (current_mode_ < num_modes_) {
+				current_mode_++;
+			}
+
+		} // popFront
+
+	} // ModeRange
+
+	// refers to SDL2 video display index
+	int display_index;
+
+	const(char)[] name;
+	const(char)* c_name;
+	float ddpi, hdpi, vdpi;
+	int num_display_modes;
+
+	auto modes() @nogc nothrow const {
+		return ModeRange(display_index, num_display_modes);
+	} // modes
+
+} // Display
+
 struct Window {
 
 	enum Error {
@@ -118,62 +178,6 @@ struct Window {
 
 	auto displays() {
 
-		static struct ModeRange {
-		nothrow:
-		@nogc:
-
-			// SDL2 display index
-			int display_;
-
-			int current_mode_;
-			int num_modes_;
-
-			this(int display_index, int modes) {
-				this.display_ = display_index;
-				this.num_modes_ = modes;
-				this.current_mode_ = 0;
-			} // this
-
-			@property bool empty() const {
-				return current_mode_ == num_modes_;
-			} // empty
-
-			@property SDL_DisplayMode front() {
-
-				SDL_DisplayMode mode;
-				SDL_GetDisplayMode(display_, current_mode_, &mode);
-
-				return mode;
-
-			} // front
-
-			void popFront() {
-
-				if (current_mode_ < num_modes_) {
-					current_mode_++;
-				}
-
-			} // popFront
-
-		} // ModeRange
-
-		static struct Display {
-		nothrow:
-		@nogc:
-			
-			// refers to SDL2 index
-			int display_index_;
-
-			const (char)* name;
-			float ddpi, hdpi, vdpi;
-			int num_display_modes_;
-
-			auto modes() {
-				return ModeRange(display_index_, num_display_modes_);
-			} // modes
-
-		} // Display
-
 		static struct DisplayRange {
 		nothrow:
 		@nogc:
@@ -190,14 +194,26 @@ struct Window {
 				return current_display_ == num_displays_;
 			} // empty
 
-			@property Display front() {
+			@property const(Display) front() {
 
-				Display display;
+				import std.string : fromStringz;
 
-				display.display_index_ = current_display_;
-				display.name = SDL_GetDisplayName(current_display_);
-				SDL_GetDisplayDPI(current_display_, &display.ddpi, &display.hdpi, &display.vdpi);
-				display.num_display_modes_ = SDL_GetNumDisplayModes(current_display_);
+				auto display_name = SDL_GetDisplayName(current_display_);
+
+				float ddpi, hdpi, vdpi;
+				SDL_GetDisplayDPI(current_display_, &ddpi, &hdpi, &vdpi);
+
+				auto display_modes = SDL_GetNumDisplayModes(current_display_);
+
+				const(Display) display = {
+					display_index : current_display_,
+					c_name : display_name,
+					name : fromStringz(display_name),
+					ddpi : ddpi,
+					hdpi : hdpi,
+					vdpi : vdpi,
+					num_display_modes : display_modes
+				};
 
 				return display;
 
@@ -228,7 +244,7 @@ struct Window {
 
 		foreach (d_i, ref display; all_displays.enumerate(1)) {
 
-			printf("%d. %s \n", d_i, display.name);
+			printf("%d. %s \n", d_i, display.c_name);
 			printf("   DPI: ddpi: %f, hdpi: %f, vdpi: %f \n", display.ddpi, display.hdpi, display.vdpi);
 
 			auto modes = display.modes();
