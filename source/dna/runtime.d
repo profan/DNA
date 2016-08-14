@@ -17,6 +17,15 @@ alias UpdateFunc = void delegate();
 alias DrawFunc = void delegate(double);
 alias RunFunc = void delegate();
 
+template isGame(T) {
+
+	import std.traits : hasMember;
+
+	enum hasGame = (hasMember!(T, "update") && hasMember!(T, "draw"));
+	static assert(hasGame, "Game struct should at least implement methods update, draw");
+
+} // isGame
+
 struct Engine {
 
 	enum Error {
@@ -106,6 +115,12 @@ struct Engine {
 		import std.functional : toDelegate;
 
 		return create(engine, toDelegate(update_fn), toDelegate(draw_fn));
+
+	} // create
+
+	static Error create(GameType)(ref GameType game, ref Engine engine) {
+
+		return create(engine, &game.update, &game.draw);
 
 	} // create
 
@@ -207,7 +222,7 @@ struct Engine {
 	} // renderString
 
 	/**
-	 * Starts the engine's fixed upate run loop, which attempts to run both update and draw at fixed intervals.
+	 * Starts the engine's fixed update run loop, which attempts to run both update and draw at fixed intervals.
 	 * Currently does not do any pacing/dropping frames in order to retain the update speed if things start running slow,
 	 *  can be switched out by the user if they desire entirely custom functionality in terms of the run loop.
 	*/

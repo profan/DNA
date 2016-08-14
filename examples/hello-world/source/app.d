@@ -26,7 +26,7 @@ struct Game {
 
 	static auto create(ref Game game) {
 
-		return Engine.create(game.engine, &game.update, &game.draw);
+		return Engine.create(game, game.engine);
 
 	} // create
 	

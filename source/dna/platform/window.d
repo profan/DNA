@@ -110,33 +110,129 @@ struct Window {
 		window.adjustProjection();
 
 		// display modes
-		// window.printDisplayModes();
+		window.printDisplayModes();
 
 		return Error.Success;
 
 	} // create
 
+	auto displays() {
+		
+
+		static struct ModeRange {
+		nothrow:
+		@nogc:
+
+			// SDL2 display index
+			int display_;
+
+			int current_mode_;
+			int num_modes_;
+
+			this(int display_index, int modes) {
+				this.display_ = display_index;
+				this.num_modes_ = modes;
+				this.current_mode_ = 0;
+			} // this
+
+			@property bool empty() const {
+				return current_mode_ == num_modes_;
+			} // empty
+
+			@property SDL_DisplayMode front() {
+
+				SDL_DisplayMode mode;
+				SDL_GetDisplayMode(display_, current_mode_, &mode);
+
+				return mode;
+
+			} // front
+
+			void popFront() {
+
+				if (current_mode_ < num_modes_) {
+					current_mode_++;
+				}
+
+			} // popFront
+
+		} // ModeRange
+
+		static struct Display {
+		nothrow:
+		@nogc:
+			
+			// refers to SDL2 index
+			int display_index_;
+
+			const (char)* name;
+			float ddpi, hdpi, vdpi;
+			int num_display_modes_;
+
+			auto modes() {
+				return ModeRange(display_index_, num_display_modes_);
+			} // modes
+
+		} // Display
+
+		static struct DisplayRange {
+		nothrow:
+		@nogc:
+
+			int current_display_;
+			int num_displays_;
+
+			this(int displays) {
+				this.num_displays_ = displays;
+				this.current_display_ = 0;
+			} // this
+
+			@property bool empty() const {
+				return current_display_ == num_displays_;
+			} // empty
+
+			@property Display front() {
+
+				Display display;
+
+				display.display_index_ = current_display_;
+				display.name = SDL_GetDisplayName(current_display_);
+				SDL_GetDisplayDPI(current_display_, &display.ddpi, &display.hdpi, &display.vdpi);
+				display.num_display_modes_ = SDL_GetNumDisplayModes(current_display_);
+
+				return display;
+
+			} // front
+
+			void popFront() {
+
+				if (current_display_ < num_displays_) {
+					current_display_++;
+				}
+
+			} // popFront
+
+		} // DisplayRange
+
+		auto num_displays = SDL_GetNumVideoDisplays();
+		return DisplayRange(num_displays);
+
+	} // displays
+
+	@nogc
 	void printDisplayModes() {
 
-		auto result = SDL_GetNumVideoDisplays();
-		assert(result > 1);
+		auto available_displays = displays();
+		printf("[DNA] Listing displays and their modes. \n");
 
-		foreach(d_i; 0 .. result) {
+		for (auto display = available_displays.front; !available_displays.empty; available_displays.popFront()) {
 
-			printf("[DNA] Display: %s \n", SDL_GetDisplayName(d_i));
+			printf("Display: %s \n", display.name);
+			printf(" DPI: ddpi: %f, hdpi: %f, vdpi: %f \n", display.ddpi, display.hdpi, display.vdpi);
 
-			float ddpi, hdpi, vdpi;
-			SDL_GetDisplayDPI(d_i, &ddpi, &hdpi, &vdpi);
-			printf("	- DPI: ddpi: %f, hdpi: %f, vdpi: %f \n", ddpi, hdpi, vdpi);
-
-			auto modes_result = SDL_GetNumDisplayModes(d_i);
-			assert(modes_result > 1);
-
-			printf("	- modes: ");
-			foreach (m_i; 0 .. modes_result) {
-				SDL_DisplayMode mode;
-				SDL_GetDisplayMode(d_i, m_i, &mode);
-				printf("		- w: %d, h: %d, refresh rate: %d \n", mode.w, mode.h, mode.refresh_rate);
+			auto modes = display.modes();
+			for (auto mode = modes.front; !modes.empty; modes.popFront()) {
+				printf("  - w: %d, h: %d, refresh rate: %d \n", mode.w, mode.h, mode.refresh_rate);
 			}
 
 		}

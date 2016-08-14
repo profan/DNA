@@ -8,7 +8,7 @@
 		"derelict-util": "2.0.6",
 		"derelict-alure": "1.0.0",
 		"gfm": "6.1.1",
-		"gland": "~feature/textures",
+		"gland": "~master",
 		"collections": "~master"
 	}
 }
