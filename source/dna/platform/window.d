@@ -2,57 +2,22 @@ module dna.platform.window;
 
 import core.stdc.stdio;
 import core.stdc.stdlib : exit;
-import std.typecons : tuple;
+import std.typecons : tuple, Tuple;
 
 import derelict.sdl2.sdl;
 import glad.gl.loader;
 import glad.gl.gl;
 
-static struct Display {
+// SDL_PixelFormatEnum
+enum WindowPixelFormat {
+	None
+} // WindowPixelFormat
+
+struct Display {
 
 	static struct Mode {
 
 	} // Mode
-
-	static struct ModeRange {
-
-		@nogc:
-		nothrow:
-
-		// SDL2 display index
-		int display_;
-
-		int current_mode_;
-		int num_modes_;
-
-		this(int display_index, int modes) {
-			this.display_ = display_index;
-			this.num_modes_ = modes;
-			this.current_mode_ = 0;
-		} // this
-
-		@property bool empty() const {
-			return current_mode_ == num_modes_;
-		} // empty
-
-		@property SDL_DisplayMode front() {
-
-			SDL_DisplayMode mode;
-			SDL_GetDisplayMode(display_, current_mode_, &mode);
-
-			return mode;
-
-		} // front
-
-		void popFront() {
-
-			if (current_mode_ < num_modes_) {
-				current_mode_++;
-			}
-
-		} // popFront
-
-	} // ModeRange
 
 	// refers to SDL2 video display index
 	int display_index;
@@ -63,10 +28,54 @@ static struct Display {
 	int num_display_modes;
 
 	auto modes() @nogc nothrow const {
+
+		static struct ModeRange {
+
+			@nogc:
+			nothrow:
+
+			// SDL2 display index
+			int display_;
+
+			int current_mode_;
+			int num_modes_;
+
+			this(int display_index, int modes) {
+				this.display_ = display_index;
+				this.num_modes_ = modes;
+				this.current_mode_ = 0;
+			} // this
+
+			@property bool empty() const {
+				return current_mode_ == num_modes_;
+			} // empty
+
+			@property SDL_DisplayMode front() {
+
+				SDL_DisplayMode mode;
+				SDL_GetDisplayMode(display_, current_mode_, &mode);
+
+				return mode;
+
+			} // front
+
+			void popFront() {
+
+				if (current_mode_ < num_modes_) {
+					current_mode_++;
+				}
+
+			} // popFront
+
+		} // ModeRange
+
 		return ModeRange(display_index, num_display_modes);
+
 	} // modes
 
 } // Display
+
+alias MousePos = Tuple!(int, "x", int, "y");
 
 struct Window {
 
@@ -179,8 +188,9 @@ struct Window {
 	auto displays() {
 
 		static struct DisplayRange {
-		nothrow:
-		@nogc:
+
+			nothrow:
+			@nogc:
 
 			int current_display_;
 			int num_displays_;
@@ -314,9 +324,9 @@ struct Window {
 
 		return 0; // all is well
 
-	}
+	} // createGLContext
 
-	void adjustProjection() {
+	private void adjustProjection() {
 
 		import gland.util : transpose, orthographic;
 		view_projection_ = transpose(orthographic(0.0f, width_, height_, 0.0f, 0.0f, 1.0f));
@@ -339,7 +349,7 @@ struct Window {
 
 			if (severity == GL_DEBUG_SEVERITY_HIGH) {
 				printf("Aborting...\n");
-				exit(-1);
+				assert(0);
 			}
 
 		} //openGLCallbackFunction
@@ -361,7 +371,7 @@ struct Window {
 
 			if (severity == GL_DEBUG_SEVERITY_HIGH) {
 				printf("Aborting...\n");
-				exit(-1);
+				assert(0);
 			}
 
 		} //openGLCallbackFunction		
@@ -375,39 +385,16 @@ struct Window {
 	} // present
 
 	nothrow @nogc
-	bool isKeyDown(SDL_Scancode key) {
+	void handleEvent(ref SDL_Event ev) {
 
-		return cast(bool)keyboard_[key];
+		switch (ev.type) {
 
-	} // isKeyDown
+			case SDL_QUIT:
+				alive_ = false;
+				break;
 
-	nothrow @nogc
-	auto getMousePosition() {
-
-		int x, y;
-		SDL_GetMouseState(&x, &y);
-
-		return tuple(x, y);
-
-	} // getMousePosition
-
-	nothrow @nogc
-	void handleEvents() {
-
-		SDL_Event ev;
-
-		while (SDL_PollEvent(&ev)) {
-
-			switch (ev.type) {
-
-				case SDL_QUIT:
-					alive_ = false;
-					break;
-
-				default:
-					break;
-
-			}
+			default:
+				break;
 
 		}
 

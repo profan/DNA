@@ -2,6 +2,7 @@ module dna.runtime;
 
 import std.experimental.allocator : theAllocator, IAllocator;
 
+import dna.platform.event;
 import dna.platform.window;
 import dna.platform.audio;
 import dna.platform.input;
@@ -26,6 +27,8 @@ template isGame(T) {
 
 } // isGame
 
+alias GameEventManager = EventManager!(Window);
+
 struct Engine {
 
 	enum Error {
@@ -44,6 +47,9 @@ struct Engine {
 
 		// opengl rendering context
 		Device device_;
+
+		// sdl event dispatcher
+		GameEventManager event_;
 
 		// modules go here
 		SoundSystem sound_;
@@ -174,6 +180,10 @@ struct Engine {
 				break;
 		}
 
+		// wire up event dispatcher
+		engine.event_.attach(engine.window_);
+
+		// set up userspace update and draw
 		engine.update_fn_ = update_fn;
 		engine.draw_fn_ = draw_fn;
 
@@ -256,8 +266,8 @@ struct Engine {
 
 				update_timer.start();
 
-				// handle window events
-				window_.handleEvents();
+				// handle new events
+				event_.handleEvents();
 
 				// update ze things
 				update_fn_();

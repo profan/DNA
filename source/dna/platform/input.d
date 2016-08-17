@@ -1,7 +1,8 @@
 module dna.platform.input;
 
-import derelict.sdl2.sdl;
+import core.stdc.stdio : printf;
 import std.typecons : Tuple;
+import derelict.sdl2.sdl;
 
 enum Key {
 
@@ -278,10 +279,26 @@ struct Input {
 
 	} // mousePos
 
+	nothrow @nogc
+	static auto mouseState(out MousePos pos) {
+
+		return SDL_GetMouseState(&pos.x, &pos.y);
+
+	} // mouseState
+
+
 	static bool isKeyDown(Key key) {
 
 		return cast(bool)keys_[key];
 
 	} // isKeyDown
+
+	void setRelativeMouseMode(bool state) {
+
+		auto status = SDL_SetRelativeMouseMode(state);
+		if (status == -1) { printf("SDL_SetRelativeMouseMode not supported on this platform!"); }
+
+	} // setRelativeMouseMode
+
 
 } // Input
