@@ -124,6 +124,11 @@ struct Engine {
 
 	} // create
 
+	/**
+	 * Overload which creates the engine from a struct with the update/draw fields defined,
+	 * created in order to make it unnecessary to define everything as parameters later on,
+	 * one could just add another field to test for in the struct type passed.
+	*/
 	static Error create(GameType)(ref GameType game, ref Engine engine) {
 
 		return create(engine, &game.update, &game.draw);
@@ -194,9 +199,9 @@ struct Engine {
 	/**
 	 * Clears the screen and calls the user-supplied draw function, presenting the rendered data after.
 	*/
-	void draw() {
+	void draw(ClearParams clear_data = ClearParams(to!GLColour(0x428bca))) {
 
-		device_.clearColour(0x428bca);
+		device_.clear(clear_data);
 
 		// user draw
 		draw_fn_(1.0);
@@ -270,7 +275,7 @@ struct Engine {
 				event_.handleEvents();
 
 				// update ze things
-				update_fn_();
+				this.update_fn_();
 
 				update_time_ = cast(double)update_timer.peek() / cast(double)tps;
 				last_update = main_timer.peek();
@@ -283,7 +288,7 @@ struct Engine {
 				/ (cast(double)update_iter / cast(double)tps);
 
 			draw_timer.start();
-			draw();
+			this.draw();
 			draw_time_ = cast(double)draw_timer.peek() / cast(double)tps;
 			last_draw = draw_timer.peek();
 			draw_timer.reset();
