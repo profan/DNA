@@ -84,51 +84,34 @@ import core.stdc.stdio : FILE, fopen, fclose, fseek, ftell, fread, SEEK_END, SEE
 public:
 // welcome to version hell!
 version(nanovg_force_detect) {} else version(nanovg_use_freetype) { version = nanovg_use_freetype_ii; }
-version(nanovg_ignore_iv_stb_ttf) enum nanovg_ignore_iv_stb_ttf = true; else enum nanovg_ignore_iv_stb_ttf = false;
-//version(nanovg_ignore_mono);
 
 version(nanovg_use_freetype_ii) {
 	enum HasAST = false;
-	//pragma(msg, "iv.freetype: forced");
 } else {
-	static if (!nanovg_ignore_iv_stb_ttf && __traits(compiles, { import iv.stb.ttf; })) {
-		import iv.stb.ttf;
-		enum HasAST = true;
-		//pragma(msg, "iv.stb.ttf");
-	} else static if (__traits(compiles, { import arsd.ttf; })) {
-		import arsd.ttf;
-		enum HasAST = true;
-		//pragma(msg, "arsd.ttf");
-	} else static if (__traits(compiles, { import stb_truetype; })) {
+	static if (__traits(compiles, { import stb_truetype; })) {
 		import stb_truetype;
 		enum HasAST = true;
-		//pragma(msg, "stb_truetype");
 	} else static if (__traits(compiles, { import derelict.freetype.ft; })) {
 		import derelict.freetype.ft;
 		enum HasAST = false;
-		//pragma(msg, "iv.freetype");
 	} else {
-		static assert(0, "no stb_ttf/iv.freetype found!");
+		static assert(0, "no stb_ttf/freetype found!");
 	}
 }
 
-//version = nanovg_kill_font_blur;
-
-
 // ////////////////////////////////////////////////////////////////////////// //
-//version = nanovg_ft_mono;
 
 enum FONS_INVALID = -1;
 
 alias FONSflags = int;
-enum /*FONSflags*/ {
+enum /* FONSflags */ {
 	FONS_ZERO_TOPLEFT    = 1<<0,
 	FONS_ZERO_BOTTOMLEFT = 1<<1,
 }
 
-/+
+/**
 alias FONSalign = int;
-enum /*FONSalign*/ {
+enum /+ FONSalign +/ {
 	// Horizontal align
 	FONS_ALIGN_LEFT   = 1<<0, // Default
 	FONS_ALIGN_CENTER   = 1<<1,
@@ -139,7 +122,7 @@ enum /*FONSalign*/ {
 	FONS_ALIGN_BOTTOM = 1<<5,
 	FONS_ALIGN_BASELINE = 1<<6, // Default
 }
-+/
+*/
 
 alias FONSerrorCode = int;
 enum /*FONSerrorCode*/ {
@@ -208,9 +191,7 @@ struct FONStextIter {
 
 
 // ////////////////////////////////////////////////////////////////////////// //
-//static if (!HasAST) version = nanovg_use_freetype_ii_x;
 
-/*version(nanovg_use_freetype_ii_x)*/ 
 static if (!HasAST) {
 
 	import derelict.freetype.ft;
@@ -257,8 +238,6 @@ static if (!HasAST) {
 	int fons__tt_buildGlyphBitmap (FONSttFontImpl* font, int glyph, float size, float scale, int* advance, int* lsb, int* x0, int* y0, int* x1, int* y1) {
 		FT_Error ftError;
 		FT_GlyphSlot ftGlyph;
-		//version(nanovg_ignore_mono) enum exflags = 0;
-		//else version(nanovg_ft_mono) enum exflags = FT_LOAD_MONOCHROME; else enum exflags = 0;
 		uint exflags = (font.mono ? FT_LOAD_MONOCHROME : 0);
 		ftError = FT_Set_Pixel_Sizes(font.font, 0, cast(FT_UInt)(size*cast(float)font.font.units_per_EM/cast(float)(font.font.ascender-font.font.descender)));
 		if (ftError) return 0;
@@ -277,10 +256,6 @@ static if (!HasAST) {
 
 	void fons__tt_renderGlyphBitmap (FONSttFontImpl* font, ubyte* output, int outWidth, int outHeight, int outStride, float scaleX, float scaleY, int glyph) {
 		FT_GlyphSlot ftGlyph = font.font.glyph;
-		//FONS_NOTUSED(glyph); // glyph has already been loaded by fons__tt_buildGlyphBitmap
-		//version(nanovg_ignore_mono) enum RenderAA = true;
-		//else version(nanovg_ft_mono) enum RenderAA = false;
-		//else enum RenderAA = true;
 		if (font.mono) {
 			auto src = ftGlyph.bitmap.buffer;
 			auto dst = output;
@@ -507,16 +482,6 @@ private enum DecUtfMixin(string state, string codep, string byte_) =
 		`~codep~` = '?';
 	}
 }`;
-
-/*
-   uint fons__decutf8 (uint* state, uint* codep, uint byte_) {
-   pragma(inline, true);
-   uint type = utf8d.ptr[byte_];
- *codep = (*state != FONS_UTF8_ACCEPT ? (byte_&0x3fu)|(*codep<<6) : (0xff>>type)&byte_);
- *state = utf8d.ptr[256 + *state+type];
- return *state;
- }
- */
 
 // Atlas based on Skyline Bin Packer by Jukka Jylänki
 void fons__deleteAtlas (FONSatlas* atlas) {
@@ -775,7 +740,6 @@ public void fonsSetSpacing (FONScontext* stash, float spacing) {
 
 public void fonsSetBlur (FONScontext* stash, float blur) {
 	pragma(inline, true);
-	version(nanovg_kill_font_blur) blur = 0;
 	fons__getState(stash).blur = blur;
 }
 
@@ -813,7 +777,7 @@ public void fonsClearState (FONScontext* stash) {
 	state.font = 0;
 	state.blur = 0;
 	state.spacing = 0;
-	state.talign.reset; //FONS_ALIGN_LEFT|FONS_ALIGN_BASELINE;
+	state.talign.reset; // FONS_ALIGN_LEFT|FONS_ALIGN_BASELINE;
 }
 
 void fons__freeFont (FONSfont* font) {
@@ -824,12 +788,15 @@ void fons__freeFont (FONSfont* font) {
 }
 
 int fons__allocFont (FONScontext* stash) {
+
 	FONSfont* font = null;
+
 	if (stash.nfonts+1 > stash.cfonts) {
 		stash.cfonts = (stash.cfonts == 0 ? 8 : stash.cfonts*2);
 		stash.fonts = cast(FONSfont**)realloc(stash.fonts, (FONSfont*).sizeof*stash.cfonts);
 		if (stash.fonts is null) return -1;
 	}
+
 	font = cast(FONSfont*)malloc(FONSfont.sizeof);
 	if (font is null) goto error;
 	memset(font, 0, FONSfont.sizeof);
@@ -840,17 +807,20 @@ int fons__allocFont (FONScontext* stash) {
 	font.nglyphs = 0;
 
 	stash.fonts[stash.nfonts++] = font;
+
 	return stash.nfonts-1;
 
 error:
 	fons__freeFont(font);
 
 	return FONS_INVALID;
+
 }
 
 private enum NoAlias = ":noaa";
 
 public int fonsAddFont (FONScontext* stash, const(char)[] name, const(char)[] path) {
+
 	import std.internal.cstring;
 
 	FILE* fp = null;
@@ -892,6 +862,7 @@ error:
 }
 
 public int fonsAddFontMem (FONScontext* stash, const(char)[] name, ubyte* data, int dataSize, int freeData) {
+
 	int i, ascent, descent, fh, lineGap;
 	FONSfont* font;
 
@@ -902,14 +873,13 @@ public int fonsAddFontMem (FONScontext* stash, const(char)[] name, ubyte* data, 
 
 	font = stash.fonts[idx];
 
-	//strncpy(font.name.ptr, name, (font.name).sizeof);
-	if (name.length > font.name.length-1) name = name[0..font.name.length-1];
+	if (name.length > font.name.length-1) { name = name[0..font.name.length-1]; }
 	font.name[] = 0;
 	font.name[0..name.length] = name[];
 	font.namelen = cast(uint)name.length;
 
 	// Init hash lookup.
-	for (i = 0; i < FONS_HASH_LUT_SIZE; ++i) font.lut[i] = -1;
+	for (i = 0; i < FONS_HASH_LUT_SIZE; ++i) { font.lut[i] = -1; }
 
 	// Read in the font data.
 	font.dataSize = dataSize;
@@ -942,9 +912,11 @@ error:
 }
 
 public int fonsGetFontByName (FONScontext* s, const(char)[] name) {
+
 	foreach (immutable idx, FONSfont* font; s.fonts[0..s.nfonts]) {
 		if (font.namelen == name.length && font.name[0..font.namelen] == name[]) return cast(int)idx;
 	}
+
 	// not found, try variations
 	if (name.length >= NoAlias.length && name[$-NoAlias.length..$] == NoAlias) {
 		// search for font name without ":noaa"
@@ -963,18 +935,23 @@ public int fonsGetFontByName (FONScontext* s, const(char)[] name) {
 			}
 		}
 	}
+
 	return FONS_INVALID;
+
 }
 
 
 FONSglyph* fons__allocGlyph (FONSfont* font) {
+
 	if (font.nglyphs+1 > font.cglyphs) {
 		font.cglyphs = (font.cglyphs == 0 ? 8 : font.cglyphs*2);
 		font.glyphs = cast(FONSglyph*)realloc(font.glyphs, FONSglyph.sizeof*font.cglyphs);
 		if (font.glyphs is null) return null;
 	}
+
 	++font.nglyphs;
 	return &font.glyphs[font.nglyphs-1];
+
 }
 
 
@@ -1024,7 +1001,7 @@ void fons__blur (FONScontext* stash, ubyte* dst, int w, int h, int dstStride, in
 	import std.math : expf = exp;
 	int alpha;
 	float sigma;
-	if (blur < 1) return;
+	if (blur < 1) { return; }
 	// Calculate the alpha such that 90% of the kernel is within the radius. (Kernel extends to infinity)
 	sigma = cast(float)blur*0.57735f; // 1/sqrt(3)
 	alpha = cast(int)((1<<APREC)*(1.0f-expf(-2.3f/(sigma+1.0f))));
@@ -1037,6 +1014,7 @@ void fons__blur (FONScontext* stash, ubyte* dst, int w, int h, int dstStride, in
 }
 
 FONSglyph* fons__getGlyph (FONScontext* stash, FONSfont* font, uint codepoint, short isize, short iblur) {
+
 	int i, g, advance, lsb, x0, y0, x1, y1, gw, gh, gx, gy, x, y;
 	float scale;
 	FONSglyph* glyph = null;
@@ -1046,10 +1024,8 @@ FONSglyph* fons__getGlyph (FONScontext* stash, FONSfont* font, uint codepoint, s
 	ubyte* bdst;
 	ubyte* dst;
 
-	version(nanovg_kill_font_blur) iblur = 0;
-
-	if (isize < 2) return null;
-	if (iblur > 20) iblur = 20;
+	if (isize < 2) { return null; }
+	if (iblur > 20) { iblur = 20; }
 	pad = iblur+2;
 
 	// Reset allocator.
@@ -1077,7 +1053,8 @@ FONSglyph* fons__getGlyph (FONScontext* stash, FONSfont* font, uint codepoint, s
 		stash.handleError(stash.errorUptr, FONS_ATLAS_FULL, 0);
 		added = fons__atlasAddRect(stash.atlas, gw, gh, &gx, &gy);
 	}
-	if (added == 0) return null;
+
+	if (added == 0) { return null; }
 
 	// Init glyph.
 	glyph = fons__allocGlyph(font);
@@ -1138,9 +1115,11 @@ FONSglyph* fons__getGlyph (FONScontext* stash, FONSfont* font, uint codepoint, s
 	stash.dirtyRect[3] = nvg__max(stash.dirtyRect[3], glyph.y1);
 
 	return glyph;
+
 }
 
 void fons__getQuad (FONScontext* stash, FONSfont* font, int prevGlyphIndex, FONSglyph* glyph, float scale, float spacing, float* x, float* y, FONSquad* q) {
+
 	float rx, ry, xoff, yoff, x0, y0, x1, y1;
 
 	if (prevGlyphIndex >= 0) {
@@ -1235,67 +1214,8 @@ float fons__getVertAlign (FONScontext* stash, FONSfont* font, FonsTextAlign tali
 	assert(0);
 }
 
-/+k8: not used
-public float fonsDrawText (FONScontext* stash, float x, float y, const(char)* str, const(char)* end) {
-	FONSstate* state = fons__getState(stash);
-	uint codepoint;
-	uint utf8state = 0;
-	FONSglyph* glyph = null;
-	FONSquad q;
-	int prevGlyphIndex = -1;
-	short isize = cast(short)(state.size*10.0f);
-	short iblur = cast(short)state.blur;
-	float scale;
-	FONSfont* font;
-	float width;
-
-	if (stash is null || str is null) return x;
-	if (state.font < 0 || state.font >= stash.nfonts) return x;
-	font = stash.fonts[state.font];
-	if (font.data is null) return x;
-
-	scale = fons__tt_getPixelHeightScale(&font.font, cast(float)isize/10.0f);
-
-	if (end is null) end = str+strlen(str);
-
-	// Align horizontally
-	if (state.align_&FONS_ALIGN_LEFT) {
-		// empty
-	} else if (state.align_&FONS_ALIGN_RIGHT) {
-		width = fonsTextBounds(stash, x, y, str, end, null);
-		x -= width;
-	} else if (state.align_&FONS_ALIGN_CENTER) {
-		width = fonsTextBounds(stash, x, y, str, end, null);
-		x -= width*0.5f;
-	}
-	// Align vertically.
-	y += fons__getVertAlign(stash, font, state.align_, isize);
-
-	for (; str != end; ++str) {
-		if (fons__decutf8(&utf8state, &codepoint, *cast(const(ubyte)*)str)) continue;
-		glyph = fons__getGlyph(stash, font, codepoint, isize, iblur);
-		if (glyph !is null) {
-			fons__getQuad(stash, font, prevGlyphIndex, glyph, scale, state.spacing, &x, &y, &q);
-
-			if (stash.nverts+6 > FONS_VERTEX_COUNT) fons__flush(stash);
-
-			fons__vertex(stash, q.x0, q.y0, q.s0, q.t0, state.color);
-			fons__vertex(stash, q.x1, q.y1, q.s1, q.t1, state.color);
-			fons__vertex(stash, q.x1, q.y0, q.s1, q.t0, state.color);
-
-			fons__vertex(stash, q.x0, q.y0, q.s0, q.t0, state.color);
-			fons__vertex(stash, q.x0, q.y1, q.s0, q.t1, state.color);
-			fons__vertex(stash, q.x1, q.y1, q.s1, q.t1, state.color);
-		}
-		prevGlyphIndex = (glyph !is null ? glyph.index : -1);
-	}
-	fons__flush(stash);
-
-	return x;
-}
-+/
-
 public bool fonsTextIterInit(T) (FONScontext* stash, FONStextIter* iter, float x, float y, const(T)[] str) if (is(T == char) || is(T == dchar)) {
+
 	if (stash is null || iter is null) return false;
 
 	FONSstate* state = fons__getState(stash);
@@ -1344,11 +1264,14 @@ public bool fonsTextIterInit(T) (FONScontext* stash, FONStextIter* iter, float x
 	iter.prevGlyphIndex = -1;
 
 	return true;
+
 }
 
 public bool fonsTextIterNext (FONScontext* stash, FONStextIter* iter, FONSquad* quad) {
+
 	if (stash is null || iter is null) return false;
 	FONSglyph* glyph = null;
+
 	if (iter.isChar) {
 		const(char)* str = iter.next;
 		iter.str = iter.next;
@@ -1390,10 +1313,13 @@ public bool fonsTextIterNext (FONScontext* stash, FONStextIter* iter, FONSquad* 
 		}
 		iter.dnext = str;
 	}
+
 	return true;
+
 }
 
 debug public void fonsDrawDebug (FONScontext* stash, float x, float y) {
+
 	int i;
 	int w = stash.params.width;
 	int h = stash.params.height;
@@ -1437,6 +1363,7 @@ debug public void fonsDrawDebug (FONScontext* stash, float x, float y) {
 	}
 
 	fons__flush(stash);
+
 }
 
 public struct FonsTextBoundsIterator {
@@ -1585,6 +1512,7 @@ public struct FonsTextBoundsIterator {
 }
 
 public float fonsTextBounds(T) (FONScontext* stash, float x, float y, const(T)[] str, float[] bounds) if (is(T == char) || is(T == dchar)) {
+
 	FONSstate* state = fons__getState(stash);
 	uint codepoint;
 	uint utf8state = 0;
@@ -1678,6 +1606,7 @@ public float fonsTextBounds(T) (FONScontext* stash, float x, float y, const(T)[]
 	}
 
 	return advance;
+
 }
 
 public void fonsVertMetrics (FONScontext* stash, float* ascender, float* descender, float* lineh) {
@@ -1767,6 +1696,7 @@ public void fonsGetAtlasSize (FONScontext* stash, int* width, int* height) {
 }
 
 public int fonsExpandAtlas (FONScontext* stash, int width, int height) {
+
 	int i, maxy = 0;
 	ubyte* data = null;
 	if (stash is null) return 0;
@@ -1814,9 +1744,11 @@ public int fonsExpandAtlas (FONScontext* stash, int width, int height) {
 	stash.ith = 1.0f/stash.params.height;
 
 	return 1;
+
 }
 
 public int fonsResetAtlas (FONScontext* stash, int width, int height) {
+
 	int i, j;
 	if (stash is null) return 0;
 
@@ -1858,4 +1790,5 @@ public int fonsResetAtlas (FONScontext* stash, int width, int height) {
 	fons__addWhiteRect(stash, 2, 2);
 
 	return 1;
+
 }
