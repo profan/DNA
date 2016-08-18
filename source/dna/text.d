@@ -82,7 +82,6 @@ private {
 
 struct FontAtlas {
 
-
 	private struct CharacterInfo {
 
 		float advance_x; // advance.x

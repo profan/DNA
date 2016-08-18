@@ -1,3 +1,5 @@
+module dna.ports.fontstash;
+
 /**
  * This structure is here because in the original port by ketmar, it was under the name FonsTextAlign and replaced the original
  * type in the fontstash library where it was just an integer with an enum, we don't wish to depend on anything nanovg specifically
