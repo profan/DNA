@@ -12,6 +12,7 @@ alias SoundID = int;
 alias SoundVolume = float;
 alias SoundBuffer = ALuint;
 alias SoundSource = ALuint;
+alias SoundPosition = float[3];
 
 auto to(T:ALboolean)(bool b) {
 	return (b) ? AL_TRUE : AL_FALSE;
@@ -26,14 +27,14 @@ struct SoundSystem {
 		Success = "Successfully created the SoundSystem!"
 	} // Error
 
-	//TODO: take a look at this later, should it be a constant?
+	// TODO: take a look at this later, should it be a constant?
 	enum INITIAL_BUFFERS = 16;
 
 	enum State {
+		Free,
 		Playing,
 		Looping,
-		Paused,
-		Free
+		Paused
 	} // State
 
 	static struct Source {
@@ -196,6 +197,17 @@ struct SoundSystem {
 		}
 
 	} // playSound
+
+	/**
+	 * Returns a range of all the sound sources.
+	*/
+	auto sounds() {
+
+		static struct SourceRange {
+
+		} // SourceRange
+
+	} // sounds
 
 	void pauseAllSounds() {
 

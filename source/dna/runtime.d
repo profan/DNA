@@ -113,6 +113,19 @@ struct Engine {
 	} // ~this
 
 	/**
+	 * Forward calls to subsystems if possible.
+	*/
+	auto opDispatch(string f, Args...)(auto ref Args args) {
+
+		import std.traits : hasMember;
+
+		static if (hasMember!(SoundSystem, f)) {
+			return __traits(getMember, sound_, f)(args);
+		}
+
+	} // opDispatch
+
+	/**
 	 * Convenience overload that allows passing two free functions and automatically converts them to
 	 *  delegates internally.
 	*/
@@ -273,6 +286,9 @@ struct Engine {
 
 				// handle new events
 				event_.handleEvents();
+
+				// process audio
+				sound_.tick();
 
 				// update ze things
 				this.update_fn_();
