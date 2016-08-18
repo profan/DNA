@@ -1216,6 +1216,66 @@ float fons__getVertAlign (FONScontext* stash, FONSfont* font, FonsTextAlign tali
 	assert(0);
 }
 
+public float fonsDrawText (FONScontext* stash, float x, float y, const(char)* str, const(char)* end) {
+
+	FONSstate* state = fons__getState(stash);
+	uint codepoint;
+	uint utf8state = 0;
+	FONSglyph* glyph = null;
+	FONSquad q;
+	int prevGlyphIndex = -1;
+	short isize = cast(short)(state.size*10.0f);
+	short iblur = cast(short)state.blur;
+	float scale;
+	FONSfont* font;
+	float width;
+
+	if (stash is null || str is null) return x;
+	if (state.font < 0 || state.font >= stash.nfonts) return x;
+	font = stash.fonts[state.font];
+	if (font.data is null) return x;
+
+	scale = fons__tt_getPixelHeightScale(&font.font, cast(float)isize/10.0f);
+
+	if (end is null) end = str+strlen(str);
+
+	// Align horizontally
+	if (state.align_&FONS_ALIGN_LEFT) {
+		// empty
+	} else if (state.align_&FONS_ALIGN_RIGHT) {
+		width = fonsTextBounds(stash, x, y, str, end, null);
+		x -= width;
+	} else if (state.align_&FONS_ALIGN_CENTER) {
+		width = fonsTextBounds(stash, x, y, str, end, null);
+		x -= width*0.5f;
+	}
+	// Align vertically.
+	y += fons__getVertAlign(stash, font, state.align_, isize);
+
+	for (; str != end; ++str) {
+		if (fons__decutf8(&utf8state, &codepoint, *cast(const(ubyte)*)str)) continue;
+		glyph = fons__getGlyph(stash, font, codepoint, isize, iblur);
+		if (glyph !is null) {
+			fons__getQuad(stash, font, prevGlyphIndex, glyph, scale, state.spacing, &x, &y, &q);
+
+			if (stash.nverts+6 > FONS_VERTEX_COUNT) fons__flush(stash);
+
+			fons__vertex(stash, q.x0, q.y0, q.s0, q.t0, state.color);
+			fons__vertex(stash, q.x1, q.y1, q.s1, q.t1, state.color);
+			fons__vertex(stash, q.x1, q.y0, q.s1, q.t0, state.color);
+
+			fons__vertex(stash, q.x0, q.y0, q.s0, q.t0, state.color);
+			fons__vertex(stash, q.x0, q.y1, q.s0, q.t1, state.color);
+			fons__vertex(stash, q.x1, q.y1, q.s1, q.t1, state.color);
+		}
+		prevGlyphIndex = (glyph !is null ? glyph.index : -1);
+	}
+	fons__flush(stash);
+
+	return x;
+
+}
+
 public bool fonsTextIterInit(T) (FONScontext* stash, FONStextIter* iter, float x, float y, const(T)[] str) if (is(T == char) || is(T == dchar)) {
 
 	if (stash is null || iter is null) return false;

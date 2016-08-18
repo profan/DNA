@@ -78,6 +78,9 @@ struct Engine {
 
 	@property {
 
+		// graphics device
+		ref Device device() { return device_; }
+
 		int update_rate () { return update_rate_; }
 		int update_rate (int new_rate) {
 			if (new_rate > 0) { update_rate_ = new_rate; }
