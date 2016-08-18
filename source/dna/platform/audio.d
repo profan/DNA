@@ -43,15 +43,15 @@ struct SoundSystem {
 
 	private {
 
-		//audio device and context
+		// audio device and context
 		ALCdevice* device_;
 		ALCcontext* context_;
 
-		//containers for references to buffers and sources
+		// containers for references to buffers and sources
 		HashMap!(SoundID, SoundBuffer) buffers_;
 		ArraySOA!Source sources_;
 
-		//counter for resource ids for loaded sounds
+		// counter for resource ids for loaded sounds
 		SoundID current_sound_id_;
 
 	}
@@ -76,7 +76,7 @@ struct SoundSystem {
 
 	} // load
 
-	static Error create(ref SoundSystem system, IAllocator allocator, size_t num_sources) {
+	static Error create(out SoundSystem system, IAllocator allocator, size_t num_sources) {
 
 		import std.algorithm.mutation : move;
 
@@ -107,7 +107,7 @@ struct SoundSystem {
 
 	~this() {
 
-		if (device_ && context_ ) { //FUCKING WOW? ughhhhh
+		if (device_ && context_ ) { // FUCKING WOW? ughhhhh
 			alDeleteSources(cast(int)sources_.length, sources_.sources.ptr);
 			alDeleteBuffers(cast(int)buffers_.length, buffers_.values.ptr);
 			alcMakeContextCurrent(null);
@@ -119,15 +119,14 @@ struct SoundSystem {
 
 	void expandSources() {
 
-		sources_.reserve(sources_.length + 16); //add 16 to sources capacity
+		sources_.reserve(sources_.length + 16); // add 16 to sources capacity
 		sources_.length = sources_.capacity;
 		alGenSources(cast(int)sources_.capacity, sources_.sources.ptr);
 
 	} // expandSources
 
-
 	/**
-	 * Create a new OpenAL buffer from a passed $(D ubyte[]) slice, returning the ID assigned.
+	 * Create a new OpenAL sound buffer from a passed $(D ubyte[]) slice, returning the ID assigned.
 	*/
 	auto loadSoundFromMemory(ubyte[] buffer) {
 

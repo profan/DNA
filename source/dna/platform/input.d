@@ -256,6 +256,7 @@ enum Key {
 } // Key
 
 alias MousePos = Tuple!(int, "x", int, "y");
+
 struct Input {
 
 	static {
@@ -269,6 +270,7 @@ struct Input {
 	static void initialize() {
 
 		keys_ = SDL_GetKeyboardState(null);
+		assert(keys_ != null, "keys_ was null, SDL_GetKeyboardState failed!");
 
 	} // initialize
 
@@ -299,6 +301,5 @@ struct Input {
 		if (status == -1) { printf("SDL_SetRelativeMouseMode not supported on this platform!"); }
 
 	} // setRelativeMouseMode
-
 
 } // Input
