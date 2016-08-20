@@ -41,9 +41,12 @@ private {
 	alias Vec4f = float[4];
 
 	struct Vertex4f {
+
 		Vec4f coord;
+
+		@Normalized
 		ubyte[4] colour;
-		alias coord this;
+
 	} // Vertex4f
 
 	struct TextUniform {
