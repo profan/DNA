@@ -1216,6 +1216,8 @@ float fons__getVertAlign (FONScontext* stash, FONSfont* font, FonsTextAlign tali
 	assert(0);
 }
 
+
+/*
 public float fonsDrawText (FONScontext* stash, float x, float y, const(char)[] str) {
 
 	FONSstate* state = fons__getState(stash);
@@ -1273,8 +1275,9 @@ public float fonsDrawText (FONScontext* stash, float x, float y, const(char)[] s
 	fons__flush(stash);
 
 	return x;
-
 }
+
+*/
 
 public bool fonsTextIterInit(T) (FONScontext* stash, FONStextIter* iter, float x, float y, const(T)[] str) if (is(T == char) || is(T == dchar)) {
 

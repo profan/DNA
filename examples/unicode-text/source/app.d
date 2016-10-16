@@ -21,10 +21,17 @@ void main() {
 struct Game {
 
 	private {
+
 		Engine engine;
+
+		import dna.unitext : FontAtlas = FAtlas;
+		FAtlas atlas;
+
 	}
 
 	static auto create(ref Game game) {
+
+		auto atlas_err = FAtlas.create(atlas, game.engine.device, "fonts/OpenSans-Regular.ttf");
 
 		return Engine.create(game, game.engine);
 
@@ -43,6 +50,7 @@ struct Game {
 	void draw(double dt) {
 
 		auto mouse_pos = Input.mousePos();
+
 		engine.renderFmtString!("X: %d, Y: %d")(mouse_pos.x, mouse_pos.y, mouse_pos.x, mouse_pos.y);
 
 	} // draw

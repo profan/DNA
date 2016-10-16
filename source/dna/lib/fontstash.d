@@ -1,5 +1,7 @@
 module dna.lib.fontstash;
 
+import std.typecons : Tuple;
+
 /**
  * This is a reimplementation of C library fontstash in more idiomatic D code,
  * created mostly because the original ported C code was such a horrific fucking
@@ -17,3 +19,16 @@ module dna.lib.fontstash;
  *  4. ???
  *  5. Profit!
 */
+
+alias Rect = Tuple!(float, "x", float, "y", float, "s", float, "t");
+
+struct Quad {
+
+	Rect top_left;
+	Rect bottom_right;
+
+} // Quad
+
+struct FontStash {
+
+} // FontStash
