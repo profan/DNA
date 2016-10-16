@@ -1,3 +1,5 @@
+module dna.ports.fontstash;
+
 /**
  * This structure is here because in the original port by ketmar, it was under the name FonsTextAlign and replaced the original
  * type in the fontstash library where it was just an integer with an enum, we don't wish to depend on anything nanovg specifically
@@ -1214,6 +1216,69 @@ float fons__getVertAlign (FONScontext* stash, FONSfont* font, FonsTextAlign tali
 	assert(0);
 }
 
+
+/*
+public float fonsDrawText (FONScontext* stash, float x, float y, const(char)[] str) {
+
+	FONSstate* state = fons__getState(stash);
+	uint codepoint;
+	uint utf8state = 0;
+	FONSglyph* glyph = null;
+	FONSquad q;
+	int prevGlyphIndex = -1;
+	short isize = cast(short)(state.size*10.0f);
+	short iblur = cast(short)state.blur;
+	float scale;
+	FONSfont* font;
+	float width;
+
+	if (stash is null || str is null) return x;
+	if (state.font < 0 || state.font >= stash.nfonts) return x;
+	font = stash.fonts[state.font];
+	if (font.data is null) return x;
+
+	scale = fons__tt_getPixelHeightScale(&font.font, cast(float)isize/10.0f);
+
+	if (end is null) end = str+strlen(str);
+
+	// Align horizontally
+	if (state.talign.left) {
+		// empty
+	} else if (state.talign.right) {
+		width = fonsTextBounds(stash, x, y, str, end, null);
+		x -= width;
+	} else if (state.talign.center) {
+		width = fonsTextBounds(stash, x, y, str, end, null);
+		x -= width*0.5f;
+	}
+	// Align vertically.
+	y += fons__getVertAlign(stash, font, state.align_, isize);
+
+	for (; str != end; ++str) {
+		if (fons__decutf8(&utf8state, &codepoint, *cast(const(ubyte)*)str)) continue;
+		glyph = fons__getGlyph(stash, font, codepoint, isize, iblur);
+		if (glyph !is null) {
+			fons__getQuad(stash, font, prevGlyphIndex, glyph, scale, state.spacing, &x, &y, &q);
+
+			if (stash.nverts+6 > FONS_VERTEX_COUNT) fons__flush(stash);
+
+			fons__vertex(stash, q.x0, q.y0, q.s0, q.t0, state.color);
+			fons__vertex(stash, q.x1, q.y1, q.s1, q.t1, state.color);
+			fons__vertex(stash, q.x1, q.y0, q.s1, q.t0, state.color);
+
+			fons__vertex(stash, q.x0, q.y0, q.s0, q.t0, state.color);
+			fons__vertex(stash, q.x0, q.y1, q.s0, q.t1, state.color);
+			fons__vertex(stash, q.x1, q.y1, q.s1, q.t1, state.color);
+		}
+		prevGlyphIndex = (glyph !is null ? glyph.index : -1);
+	}
+	fons__flush(stash);
+
+	return x;
+}
+
+*/
+
 public bool fonsTextIterInit(T) (FONScontext* stash, FONStextIter* iter, float x, float y, const(T)[] str) if (is(T == char) || is(T == dchar)) {
 
 	if (stash is null || iter is null) return false;
@@ -1610,6 +1675,7 @@ public float fonsTextBounds(T) (FONScontext* stash, float x, float y, const(T)[]
 }
 
 public void fonsVertMetrics (FONScontext* stash, float* ascender, float* descender, float* lineh) {
+
 	FONSfont* font;
 	FONSstate* state = fons__getState(stash);
 	short isize;
@@ -1623,9 +1689,11 @@ public void fonsVertMetrics (FONScontext* stash, float* ascender, float* descend
 	if (ascender) *ascender = font.ascender*isize/10.0f;
 	if (descender) *descender = font.descender*isize/10.0f;
 	if (lineh) *lineh = font.lineh*isize/10.0f;
+
 }
 
 public void fonsLineBounds (FONScontext* stash, float y, float* miny, float* maxy) {
+
 	FONSfont* font;
 	FONSstate* state = fons__getState(stash);
 	short isize;
@@ -1645,15 +1713,20 @@ public void fonsLineBounds (FONScontext* stash, float y, float* miny, float* max
 		*maxy = y+font.descender*cast(float)isize/10.0f;
 		*miny = *maxy-font.lineh*isize/10.0f;
 	}
+
 }
 
 public const(ubyte)* fonsGetTextureData (FONScontext* stash, int* width, int* height) {
+
 	if (width !is null) *width = stash.params.width;
 	if (height !is null) *height = stash.params.height;
+
 	return stash.texData;
+
 }
 
 public int fonsValidateTexture (FONScontext* stash, int* dirty) {
+
 	if (stash.dirtyRect[0] < stash.dirtyRect[2] && stash.dirtyRect[1] < stash.dirtyRect[3]) {
 		dirty[0] = stash.dirtyRect[0];
 		dirty[1] = stash.dirtyRect[1];
@@ -1666,12 +1739,14 @@ public int fonsValidateTexture (FONScontext* stash, int* dirty) {
 		stash.dirtyRect[3] = 0;
 		return 1;
 	}
+
 	return 0;
+
 }
 
 public void fonsDeleteInternal (FONScontext* stash) {
-	if (stash is null) return;
 
+	if (stash is null) return;
 	if (stash.params.renderDelete) stash.params.renderDelete(stash.params.userPtr);
 
 	foreach (int i; 0..stash.nfonts) fons__freeFont(stash.fonts[i]);
@@ -1680,7 +1755,9 @@ public void fonsDeleteInternal (FONScontext* stash) {
 	if (stash.fonts) free(stash.fonts);
 	if (stash.texData) free(stash.texData);
 	if (stash.scratch) free(stash.scratch);
+
 	free(stash);
+
 }
 
 public void fonsSetErrorCallback (FONScontext* stash, void function (void* uptr, int error, int val) callback, void* uptr) {
@@ -1713,6 +1790,7 @@ public int fonsExpandAtlas (FONScontext* stash, int width, int height) {
 	if (stash.params.renderResize !is null) {
 		if (stash.params.renderResize(stash.params.userPtr, width, height) == 0) return 0;
 	}
+
 	// Copy old texture data over.
 	data = cast(ubyte*)malloc(width*height);
 	if (data is null) return 0;
