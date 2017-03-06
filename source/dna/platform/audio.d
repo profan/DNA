@@ -18,6 +18,12 @@ auto to(T:ALboolean)(bool b) {
 	return (b) ? AL_TRUE : AL_FALSE;
 } // to
 
+enum DistanceModel {
+
+	Linear = AL_LINEAR_DISTANCE
+
+} // DistanceModel
+
 struct SoundSystem {
 
 	enum Error {
@@ -148,7 +154,7 @@ struct SoundSystem {
 	 * File path string passed _must_ be null terminated.
 	*/
 	auto loadSoundFile(char* path) {
-		
+
 		import std.string : format, fromStringz;
 
 		auto created_buffer = alureCreateBufferFromFile(path);
@@ -174,6 +180,18 @@ struct SoundSystem {
 		return error;
 
 	} // findFreeSourceIndex
+
+	void setListenerPosition(float[3] position) {
+
+		alListener3f(AL_POSITION, position[0], position[1], position[2]);
+
+	} // setListenerPosition
+
+	void setSourcePosition(ALint source_id, float[3] position) {
+
+		alSource3f(source_id, AL_POSITION, position[0], position[1], position[2]);
+
+	} // setSourcePosition
 
 	void playSound(SoundID sound_id, ALint source_id, SoundVolume volume, bool loop) {
 
