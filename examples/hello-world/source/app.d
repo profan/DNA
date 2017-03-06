@@ -34,7 +34,7 @@ struct Game {
 
 		import dna.platform.input;
 
-		if (Input.isKeyDown(Key.Escape)) {
+		if (Input.isKeyDown(Scancode.Escape)) {
 			engine.quit();
 		} // update
 

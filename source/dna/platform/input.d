@@ -5,6 +5,10 @@ import std.typecons : Tuple;
 import derelict.sdl2.sdl;
 
 enum Key {
+	Unknown
+}
+
+enum Scancode {
 
 	Unknown = SDL_SCANCODE_UNKNOWN,
 
@@ -181,7 +185,7 @@ enum Key {
 	Kp_LeftParen = SDL_SCANCODE_KP_LEFTPAREN,
 	Kp_RightParen = SDL_SCANCODE_KP_RIGHTPAREN,
 	Kp_LeftBrace = SDL_SCANCODE_KP_LEFTBRACE,
-	Kp_RighBbrace = SDL_SCANCODE_KP_RIGHTBRACE,
+	Kp_RightBrace = SDL_SCANCODE_KP_RIGHTBRACE,
 	Kp_Tab = SDL_SCANCODE_KP_TAB,
 	Kp_Backspace = SDL_SCANCODE_KP_BACKSPACE,
 	Kp_A = SDL_SCANCODE_KP_A,
@@ -288,6 +292,11 @@ struct Input {
 
 	} // mouseState
 
+	static bool isKeyDown(Scancode scancode) {
+
+		return cast(bool)keys_[scancode];
+
+	} // isKeyDown
 
 	static bool isKeyDown(Key key) {
 
