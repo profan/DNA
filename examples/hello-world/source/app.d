@@ -34,7 +34,7 @@ struct Game {
 
 		import dna.platform.input;
 
-		if (Input.isKeyDown(Scancode.Escape)) {
+		if (engine.input.isKeyDown(Scancode.Escape)) {
 			engine.quit();
 		} // update
 
@@ -42,8 +42,9 @@ struct Game {
 
 	void draw(double dt) {
 
-		auto mouse_pos = Input.mousePos();
+		auto mouse_pos = engine.input.mousePos();
 		engine.renderFmtString!("X: %d, Y: %d")(mouse_pos.x, mouse_pos.y, mouse_pos.x, mouse_pos.y);
+		writefln("x: %d, y: %d", mouse_pos.x, mouse_pos.y);
 
 	} // draw
 

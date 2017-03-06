@@ -6,7 +6,7 @@ import derelict.sdl2.sdl;
 
 enum Key {
 	Unknown
-}
+} // Key
 
 enum Scancode {
 
@@ -257,13 +257,13 @@ enum Scancode {
 	Eject = SDL_SCANCODE_EJECT,
 	Sleep = SDL_SCANCODE_SLEEP
 
-} // Key
+} // Scancode
 
 alias MousePos = Tuple!(int, "x", int, "y");
 
 struct Input {
 
-	static {
+	private {
 
 		ubyte* keys_;
 		int mouse_btns_;
@@ -271,14 +271,14 @@ struct Input {
 
 	}
 
-	static void initialize() {
+	void initialize() {
 
 		keys_ = SDL_GetKeyboardState(null);
 		assert(keys_ != null, "keys_ was null, SDL_GetKeyboardState failed!");
 
 	} // initialize
 
-	static ref MousePos mousePos() {
+	ref MousePos mousePos() {
 
 		mouse_btns_ = SDL_GetMouseState(&mouse_pos_.x, &mouse_pos_.y);
 		return mouse_pos_;
@@ -286,19 +286,19 @@ struct Input {
 	} // mousePos
 
 	nothrow @nogc
-	static auto mouseState(out MousePos pos) {
+	auto mouseState(out MousePos pos) {
 
 		return SDL_GetMouseState(&pos.x, &pos.y);
 
 	} // mouseState
 
-	static bool isKeyDown(Scancode scancode) {
+	bool isKeyDown(Scancode scancode) {
 
 		return cast(bool)keys_[scancode];
 
 	} // isKeyDown
 
-	static bool isKeyDown(Key key) {
+	bool isKeyDown(Key key) {
 
 		return cast(bool)keys_[key];
 

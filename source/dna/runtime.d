@@ -40,7 +40,7 @@ struct Engine {
 
 	} // Error
 
-	private {
+	//private {
 
 		// main allocator
 		IAllocator allocator_;
@@ -54,6 +54,7 @@ struct Engine {
 		// modules go here
 		SoundSystem sound_;
 		Window window_;
+		Input input_;
 
 		// default graphics data
 		FontAtlas text_atlas_;
@@ -74,7 +75,7 @@ struct Engine {
 		DrawFunc draw_fn_;
 		RunFunc run_fn_;
 
-	}
+	//}
 
 	@property {
 
@@ -91,6 +92,11 @@ struct Engine {
 			if (new_rate > 0) { draw_rate_ = new_rate; }
 			return draw_rate_;
 		}
+
+		Device* device() { return &device_; }
+		SoundSystem* sound() { return &sound_; }
+		Window* window() { return &window_; }
+		Input* input() { return &input_; }
 
 	}
 
@@ -170,7 +176,6 @@ struct Engine {
 			case WindowCreationFailed, ContextCreationFailed:
 				writefln("[DNA] Error: %s", cast(string)result);
 				return Error.WindowInitFailed;
-			/* we succeeded, just continue. */
 			case Success:
 				writefln("[DNA] %s", cast(string)result);
 				break;
@@ -189,7 +194,7 @@ struct Engine {
 		}
 
 		// init input modules (depends on previous currently)
-		Input.initialize();
+		engine.input.initialize();
 
 		auto atlas_result = FontAtlas.create(engine.text_atlas_, "fonts/OpenSans-Regular.ttf", 12);
 		final switch (atlas_result) with (FontAtlas.Error) {
@@ -238,7 +243,7 @@ struct Engine {
 
 		text_atlas_.renderFmtString!fmt(device_, [window_.projection], x, y, args);
 
-	} // renderString
+	} // renderFmtString
 
 	/**
 	 * Renders a string on screen starting at the given offset, using the engine's
