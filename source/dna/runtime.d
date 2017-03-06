@@ -29,6 +29,17 @@ template isGame(T) {
 
 alias GameEventManager = EventManager!(Window);
 
+struct EngineConfig {
+
+	// audio
+	int audio_sources = 32;
+
+	// default font and size
+	string font_default_path = "fonts/OpenSans-Regular.ttf";
+	int font_default_size = 12;
+
+} // EngineConfig
+
 struct Engine {
 
 	enum Error {
